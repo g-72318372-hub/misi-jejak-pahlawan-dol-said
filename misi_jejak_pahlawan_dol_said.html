@@ -1,0 +1,1438 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MISI JEJAK PAHLAWAN – DOL SAID</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+        @keyframes zoomSlow {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.04); }
+            100% { transform: scale(1); }
+        }
+        .animate-zoom {
+            animation: zoomSlow 12s ease-in-out infinite alternate;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in {
+            animation: fadeIn 0.4s ease-out forwards;
+        }
+        @keyframes cloudMove {
+            0% { transform: translateX(-10%); }
+            100% { transform: translateX(110%); }
+        }
+        .animate-cloud-1 {
+            animation: cloudMove 45s linear infinite;
+        }
+        .animate-cloud-2 {
+            animation: cloudMove 65s linear infinite 15s;
+        }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col justify-between relative overflow-x-hidden">
+
+    <!-- Latar Belakang Animasi Tropika & Awan -->
+    <div class="fixed inset-0 pointer-events-none z-0 overflow-hidden opacity-30">
+        <div class="absolute top-10 left-0 text-white/20 text-7xl animate-cloud-1"><i class="fa-solid fa-cloud"></i></div>
+        <div class="absolute top-24 left-0 text-white/10 text-9xl animate-cloud-2"><i class="fa-solid fa-cloud"></i></div>
+        <div class="absolute inset-0 bg-gradient-to-b from-emerald-950/40 via-amber-950/20 to-slate-950"></div>
+    </div>
+
+    <!-- HEADER / BAR STATUS -->
+    <header id="status-bar" class="relative z-10 bg-emerald-950/90 border-b border-amber-500/30 px-4 py-3 shadow-md backdrop-blur-md">
+        <div class="max-w-5xl mx-auto flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <button onclick="renderHome()" class="flex items-center gap-2 text-amber-400 hover:text-amber-300 font-extrabold text-base md:text-lg">
+                    <i class="fa-solid fa-shield-halved text-amber-500"></i>
+                    <span class="hidden sm:inline">MISI JEJAK PAHLAWAN</span>
+                </button>
+            </div>
+
+            <div class="flex items-center gap-2 md:gap-4 text-xs md:text-sm font-bold">
+                <div class="bg-emerald-900/80 px-3 py-1.5 rounded-xl border border-emerald-500/30 text-amber-200">
+                    <i class="fa-solid fa-users text-amber-400 mr-1"></i> <span id="display-group-name">Pendekar Naning</span>
+                </div>
+                <div class="bg-amber-500/20 px-3 py-1.5 rounded-xl border border-amber-400/40 text-amber-300">
+                    <i class="fa-solid fa-star text-amber-400 mr-1"></i> <span id="display-score">0</span>
+                </div>
+                <div class="bg-slate-800/80 px-3 py-1.5 rounded-xl border border-slate-700 text-slate-300 hidden md:flex items-center">
+                    <i class="fa-solid fa-list-check text-emerald-400 mr-1.5"></i> <span id="display-progress">0/5</span>
+                </div>
+                <button onclick="openImageModal()" title="Tetapan Gambar & Audio" class="px-3 py-1.5 bg-amber-500 hover:bg-amber-600 text-slate-950 font-black rounded-xl shadow flex items-center gap-1.5 text-xs transition">
+                    <i class="fa-solid fa-sliders"></i> <span class="hidden md:inline">Tetapan</span>
+                </button>
+                <div class="flex items-center gap-1 bg-slate-800 px-2 py-1 rounded-xl border border-slate-700">
+                    <button onclick="toggleBgm()" title="Tukar Muzik Latar" class="text-amber-300 text-xs md:text-sm font-bold flex items-center gap-1">
+                        <i id="bgm-icon" class="fa-solid fa-music"></i>
+                    </button>
+                    <input type="range" id="bgm-volume" min="0" max="1" step="0.05" value="0.12" onchange="changeBgmVolume(this.value)" class="w-12 md:w-16 accent-amber-500 cursor-pointer">
+                </div>
+                <button onclick="toggleSound()" title="Kesan Bunyi SFX" class="p-2 bg-slate-800 hover:bg-slate-700 rounded-xl border border-slate-700 text-amber-300 text-xs">
+                    <i id="sound-icon" class="fa-solid fa-volume-high"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- CONTAINER UTAMA SKRIN PERMAINAN -->
+    <main id="app-screen" data-screen="home" class="relative z-10 flex-1 flex flex-col justify-center p-4 md:p-6">
+        <div id="main-content" class="w-full">
+            <!-- Dihasilkan secara dinamik oleh JS -->
+        </div>
+    </main>
+
+    <!-- MODAL TETAPAN GAMBAR -->
+    <div id="image-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4">
+        <div class="bg-slate-900 border-2 border-amber-500/50 rounded-3xl p-6 max-w-2xl w-full shadow-2xl space-y-5 animate-fade-in text-slate-100">
+            <div class="flex justify-between items-center border-b border-slate-700 pb-3">
+                <h3 class="text-xl font-black text-amber-400 flex items-center gap-2">
+                    <i class="fa-solid fa-images"></i> Tetapan Gambar Pengembaraan
+                </h3>
+                <button onclick="closeImageModal()" class="text-slate-400 hover:text-white font-bold text-xl px-2">&times;</button>
+            </div>
+
+            <p class="text-xs md:text-sm text-slate-300 bg-amber-500/10 border border-amber-400/30 p-3 rounded-xl">
+                <i class="fa-solid fa-circle-info text-amber-400 mr-1"></i>
+                Muat naik gambar daripada komputer anda untuk dipaparkan secara langsung dalam 4 Babak Cerita. Gambar disimpan selamat dalam ingatan sesi pelayar anda!
+            </p>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 max-h-[60vh] overflow-y-auto pr-1">
+                <!-- Ruang Babak 1 -->
+                <div class="bg-slate-800/90 border border-slate-700 p-3 rounded-2xl space-y-2">
+                    <div class="flex justify-between items-center">
+                        <span class="text-xs font-bold text-amber-300">Babak 1: Kampung Naning</span>
+                        <div id="prev-1" class="w-10 h-10 rounded-lg bg-slate-950 border border-slate-700 overflow-hidden flex items-center justify-center"></div>
+                    </div>
+                    <label class="block cursor-pointer bg-slate-700 hover:bg-slate-600 text-slate-200 text-xs font-bold py-2 px-3 rounded-xl text-center border border-slate-500/40">
+                        <i class="fa-solid fa-upload mr-1"></i> Pilih Gambar
+                        <input type="file" accept="image/*" onchange="handleImageUpload(1, event)" class="hidden">
+                    </label>
+                </div>
+
+                <!-- Ruang Babak 2 -->
+                <div class="bg-slate-800/90 border border-slate-700 p-3 rounded-2xl space-y-2">
+                    <div class="flex justify-between items-center">
+                        <span class="text-xs font-bold text-amber-300">Babak 2: Dol Said</span>
+                        <div id="prev-2" class="w-10 h-10 rounded-lg bg-slate-950 border border-slate-700 overflow-hidden flex items-center justify-center"></div>
+                    </div>
+                    <label class="block cursor-pointer bg-slate-700 hover:bg-slate-600 text-slate-200 text-xs font-bold py-2 px-3 rounded-xl text-center border border-slate-500/40">
+                        <i class="fa-solid fa-upload mr-1"></i> Pilih Gambar
+                        <input type="file" accept="image/*" onchange="handleImageUpload(2, event)" class="hidden">
+                    </label>
+                </div>
+
+                <!-- Ruang Babak 3 -->
+                <div class="bg-slate-800/90 border border-slate-700 p-3 rounded-2xl space-y-2">
+                    <div class="flex justify-between items-center">
+                        <span class="text-xs font-bold text-amber-300">Babak 3: Konflik</span>
+                        <div id="prev-3" class="w-10 h-10 rounded-lg bg-slate-950 border border-slate-700 overflow-hidden flex items-center justify-center"></div>
+                    </div>
+                    <label class="block cursor-pointer bg-slate-700 hover:bg-slate-600 text-slate-200 text-xs font-bold py-2 px-3 rounded-xl text-center border border-slate-500/40">
+                        <i class="fa-solid fa-upload mr-1"></i> Pilih Gambar
+                        <input type="file" accept="image/*" onchange="handleImageUpload(3, event)" class="hidden">
+                    </label>
+                </div>
+
+                <!-- Ruang Babak 4 -->
+                <div class="bg-slate-800/90 border border-slate-700 p-3 rounded-2xl space-y-2">
+                    <div class="flex justify-between items-center">
+                        <span class="text-xs font-bold text-amber-300">Babak 4: Perjuangan</span>
+                        <div id="prev-4" class="w-10 h-10 rounded-lg bg-slate-950 border border-slate-700 overflow-hidden flex items-center justify-center"></div>
+                    </div>
+                    <label class="block cursor-pointer bg-slate-700 hover:bg-slate-600 text-slate-200 text-xs font-bold py-2 px-3 rounded-xl text-center border border-slate-500/40">
+                        <i class="fa-solid fa-upload mr-1"></i> Pilih Gambar
+                        <input type="file" accept="image/*" onchange="handleImageUpload(4, event)" class="hidden">
+                    </label>
+                </div>
+            </div>
+
+            <!-- BAHAGIAN TETAPAN GAMBAR MISI 5 (10 Gambar: 5 Pasangan Versi A & B) -->
+            <div class="border-t border-slate-700 pt-4 space-y-3">
+                <h4 class="text-sm font-black text-amber-300 flex items-center gap-2">
+                    <i class="fa-solid fa-layer-group"></i> Muat Naik Gambar Misi 5 (Versi A & Versi B)
+                </h4>
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-2 max-h-[35vh] overflow-y-auto" id="m5-upload-grid">
+                    <!-- Dihasilkan secara dinamik oleh renderM5UploadGrid() -->
+                </div>
+            </div>
+
+            <!-- BAHAGIAN TETAPAN MUZIK LATAR -->
+            <div class="border-t border-slate-700 pt-4 space-y-2">
+                <h4 class="text-sm font-black text-amber-300 flex items-center gap-2">
+                    <i class="fa-solid fa-music"></i> Muat Naik / Tukar Fail Audio Muzik Latar (BGM)
+                </h4>
+                <p class="text-xs text-slate-300">Jika mahu menukar fail audio latar, anda boleh memuat naik fail MP3 atau WAV dari komputer anda:</p>
+                <label class="inline-block cursor-pointer bg-slate-800 hover:bg-slate-700 text-amber-300 border border-amber-500/40 font-bold px-4 py-2 rounded-xl text-xs">
+                    <i class="fa-solid fa-file-audio mr-1.5"></i> Pilih Fail Audio BGM (.mp3 / .wav)
+                    <input type="file" accept="audio/*" onchange="handleBgmUpload(event)" class="hidden">
+                </label>
+            </div>
+
+            <div class="pt-2 text-right">
+                <button onclick="closeImageModal()" class="px-5 py-2.5 bg-amber-500 hover:bg-amber-600 text-slate-950 font-black rounded-xl text-sm shadow">
+                    Tutup Tetapan
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="relative z-10 bg-slate-950/90 border-t border-slate-800 px-4 py-2 text-center text-xs text-slate-400">
+        Sejarah Tahun 5 • Unit 5: Perjuangan Tokoh Tempatan (Dol Said) • KSSR Semakan
+    </footer>
+
+    <!-- LOGIK JAVASCRIPT -->
+    <script>
+        /* ==========================================================================
+           1. PERMAINAN STATE & DATA HISTORI
+           ========================================================================== */
+        const gameState = {
+            groupName: "Pendekar Naning",
+            score: 0,
+            soundEnabled: true,
+            bgmEnabled: true,
+            bgmVolume: 0.12,
+            
+            // LALUAN FIZIKAL AUDIO KEKAL (Default Fallback ke assets/audio/BGM.wav)
+            bgmSrc: localStorage.getItem('naning_bgm_audio') || 'assets/audio/Misi_Jejak_Pahlawan_Instrumental_Tenang.wav',
+            currentStoryScene: 1,
+            completedMissions: [false, false, false, false, false],
+            
+            // LALUAN FIZIKAL GAMBAR BABAK 1 - 4 KEKAL (Default Fallback ke assets/images/...)
+            uploadedImages: {
+                1: localStorage.getItem('naning_img_1') || 'assets/images/babak1-kampung.png',
+                2: localStorage.getItem('naning_img_2') || 'assets/images/babak2-dolsaid.png',
+                3: localStorage.getItem('naning_img_3') || 'assets/images/babak3-konflik.png',
+                4: localStorage.getItem('naning_img_4') || 'assets/images/babak4-perjuangan.png'
+            },
+
+            // LALUAN FIZIKAL GAMBAR MISI 5 KEKAL (10 Fail: 5 Pasangan Versi A & Versi B)
+            m5Images: {
+                1: {
+                    A: localStorage.getItem('naning_m5_1_A') || 'assets/images/Kad_1_Kenali_Dol_Said_Gambar_Sahaja.jpg',
+                    B: localStorage.getItem('naning_m5_1_B') || 'assets/images/Kad_1_Kenali_Dol_Said_Gambar_dan_Kata_Kunci.jpg'
+                },
+                2: {
+                    A: localStorage.getItem('naning_m5_2_A') || 'assets/images/Kad_2_Sebab_Penentangan_Gambar_Sahaja.jpg',
+                    B: localStorage.getItem('naning_m5_2_B') || 'assets/images/Kad_2_Sebab_Penentangan_Gambar_Sahaja.jpg'
+                },
+                3: {
+                    A: localStorage.getItem('naning_m5_3_A') || 'assets/images/Kad_3_Tahun_1831_Gambar_Sahaja.jpg',
+                    B: localStorage.getItem('naning_m5_3_B') || 'assets/images/Kad_3_Tahun_1831_Gambar_dan_Kata_Kunci.jpg'
+                },
+                4: {
+                    A: localStorage.getItem('naning_m5_4_A') || 'assets/images/Kad_4_Tahun_1832_Gambar_Sahaja.jpg',
+                    B: localStorage.getItem('naning_m5_4_B') || 'assets/images/Kad_4_Tahun_1832_Gambar_dan_Kata_Kunci.jpg'
+                },
+                5: {
+                    A: localStorage.getItem('naning_m5_5_A') || 'assets/images/Kad_5_Kesudahan_Perjuangan_Gambar_Sahaja.jpg',
+                    B: localStorage.getItem('naning_m5_5_B') || 'assets/images/Kad_5_Kesudahan_Perjuangan_Gambar_dan_Kata_Kunci.jpg'
+                }
+            },
+
+            // Jawapan Murid
+            m1Answers: {},
+            m2Answers: [],
+            m3Order: [0, 1, 2],
+            m4Answers: {},
+            
+            // Misi 5 State (Dua Tahap Petunjuk per Kad & Pentaksiran Guru)
+            m5CardKeywordState: { 1: false, 2: false, 3: false, 4: false, 5: false },
+            m5Submitted: false,
+            m5TeacherChecks: {
+                fact: false,
+                chrono: false,
+                speech: false
+            },
+            m5Approved: false
+        };
+
+        /* Data Misi 1 & Misi 2 */
+        const m1Data = [
+            { id: 1, q: "Apakah nama sebenar Dol Said?", options: ["Abdul Said bin Omar", "Dol Said bin Hassan", "Raja Ali bin Jaafar"], ans: 0 },
+            { id: 2, q: "Apakah jawatan Dol Said di Naning?", options: ["Penghulu Naning Seri Merah Raja Dol Said", "Sultan Melaka", "Panglima Perang Muar"], ans: 0 },
+            { id: 3, q: "Dol Said berasal daripada suku apakah?", options: ["Suku Semelenggang", "Suku Biduanda", "Suku Tiga Batu"], ans: 0 }
+        ];
+
+        const m2Options = [
+            { id: 'opt1', text: "British mendakwa Naning ialah jajahannya tetapi Dol Said membantah.", correct: true },
+            { id: 'opt2', text: "Dol Said enggan membayar cukai hasil tahunan satu persepuluh kepada British.", correct: true },
+            { id: 'opt3', text: "Dol Said berusaha mempertahankan kedaulatan Naning.", correct: true },
+            { id: 'opt4', text: "Dol Said mahu menjadi Sultan Melaka menggantikan British.", correct: false }
+        ];
+
+        /* Kemaskini Bar Status Header */
+        function updateStatusBar() {
+            const elGroup = document.getElementById('display-group-name');
+            const elScore = document.getElementById('display-score');
+            const elProgress = document.getElementById('display-progress');
+            
+            if (elGroup) elGroup.textContent = gameState.groupName || 'Pendekar Naning';
+            if (elScore) elScore.textContent = gameState.score;
+            if (elProgress) {
+                const count = gameState.completedMissions.filter(Boolean).length;
+                elProgress.textContent = `${count}/5`;
+            }
+        }
+
+        /* Modal Tetapan Gambar & Audio Functions */
+        function openImageModal() {
+            playSound('click');
+            renderM5UploadGrid();
+            const modal = document.getElementById('image-modal');
+            if (modal) {
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+            }
+        }
+
+        function closeImageModal() {
+            playSound('click');
+            const modal = document.getElementById('image-modal');
+            if (modal) {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            }
+        }
+
+        function handleImageUpload(sceneId, event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const dataUrl = e.target.result;
+                gameState.uploadedImages[sceneId] = dataUrl;
+                try {
+                    localStorage.setItem(`naning_img_${sceneId}`, dataUrl);
+                } catch (err) {
+                    console.log('Storage limit reached');
+                }
+                playSound('click');
+                updateImagePreviews();
+                const screen = document.getElementById('app-screen');
+                if (screen && screen.getAttribute('data-screen') === 'story' && gameState.currentStoryScene === sceneId) {
+                    renderStoryScene(sceneId);
+                }
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function handleM5ImageUpload(cardId, type, event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const dataUrl = e.target.result;
+                gameState.m5Images[cardId][type] = dataUrl;
+                try {
+                    localStorage.setItem(`naning_m5_${cardId}_${type}`, dataUrl);
+                } catch (err) {
+                    console.log('Storage limit reached');
+                }
+                playSound('click');
+                renderM5UploadGrid();
+                const screen = document.getElementById('app-screen');
+                if (screen && screen.getAttribute('data-screen') === 'mission-5') {
+                    renderMission5(document.getElementById('main-content'));
+                }
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function updateImagePreviews() {
+            for (let i = 1; i <= 4; i++) {
+                const prevDiv = document.getElementById(`prev-${i}`);
+                if (prevDiv) {
+                    const img = gameState.uploadedImages[i];
+                    if (img) {
+                        prevDiv.innerHTML = `<img src="${img}" class="w-full h-full object-cover">`;
+                    } else {
+                        prevDiv.innerHTML = `<span class="text-[10px] text-slate-500">Kosong</span>`;
+                    }
+                }
+            }
+        }
+
+        function renderM5UploadGrid() {
+            updateImagePreviews();
+            const grid = document.getElementById('m5-upload-grid');
+            if (!grid) return;
+            grid.innerHTML = m5Cards.map(card => `
+                <div class="bg-slate-800 p-2 rounded-xl border border-slate-700 space-y-1.5 text-center">
+                    <span class="text-[11px] font-bold text-amber-300 block">${card.title}</span>
+                    <div class="flex gap-1 justify-center">
+                        <label class="cursor-pointer bg-slate-700 hover:bg-slate-600 text-amber-300 text-[10px] p-1 rounded font-bold border border-slate-600">
+                            Versi A
+                            <input type="file" accept="image/*" onchange="handleM5ImageUpload(${card.id}, 'A', event)" class="hidden">
+                        </label>
+                        <label class="cursor-pointer bg-amber-500 hover:bg-amber-600 text-slate-950 text-[10px] p-1 rounded font-bold">
+                            Versi B
+                            <input type="file" accept="image/*" onchange="handleM5ImageUpload(${card.id}, 'B', event)" class="hidden">
+                        </label>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        /* ==========================================================================
+           2. AUDIO SYSTEM (WEB AUDIO API SYNTHESIZER & BGM AUDIO)
+           ========================================================================== */
+        let audioCtx = null;
+        let bgmAudio = new Audio();
+        bgmAudio.loop = true;
+
+        function initBgm() {
+            if (gameState.bgmSrc) {
+                bgmAudio.src = gameState.bgmSrc;
+            }
+            bgmAudio.volume = gameState.bgmVolume;
+        }
+
+        function playBgm() {
+            if (!gameState.bgmEnabled) return;
+            // Jika src belum diset, jangan ganggu
+            if (!bgmAudio.src && !gameState.bgmSrc) return;
+            
+            bgmAudio.volume = gameState.bgmVolume;
+            bgmAudio.play().catch(e => {
+                console.log('Autoplay restriction or missing BGM file:', e);
+            });
+        }
+
+        function pauseBgm() {
+            bgmAudio.pause();
+        }
+
+        function toggleBgm() {
+            gameState.bgmEnabled = !gameState.bgmEnabled;
+            const icon = document.getElementById('bgm-icon');
+            if (gameState.bgmEnabled) {
+                if (icon) icon.className = 'fa-solid fa-music text-amber-400';
+                const screen = document.getElementById('app-screen');
+                const currScreen = screen ? screen.getAttribute('data-screen') : '';
+                if (currScreen !== 'mission-5') {
+                    playBgm();
+                }
+            } else {
+                if (icon) icon.className = 'fa-solid fa-volume-xmark text-rose-400';
+                pauseBgm();
+            }
+        }
+
+        function changeBgmVolume(val) {
+            gameState.bgmVolume = parseFloat(val);
+            bgmAudio.volume = gameState.bgmVolume;
+        }
+
+        function handleBgmUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const dataUrl = e.target.result;
+                gameState.bgmSrc = dataUrl;
+                bgmAudio.src = dataUrl;
+                try {
+                    localStorage.setItem('naning_bgm_audio', dataUrl);
+                } catch (err) {
+                    console.log('Storage full for audio file');
+                }
+                playBgm();
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function getAudioContext() {
+            if (!audioCtx) {
+                const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+                if (AudioContextClass) {
+                    audioCtx = new AudioContextClass();
+                }
+            }
+            if (audioCtx && audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+            return audioCtx;
+        }
+
+        function toggleSound() {
+            gameState.soundEnabled = !gameState.soundEnabled;
+            const icon = document.getElementById('sound-icon');
+            if (icon) {
+                if (gameState.soundEnabled) {
+                    icon.className = 'fa-solid fa-volume-high';
+                    playSound('click');
+                } else {
+                    icon.className = 'fa-solid fa-volume-xmark text-rose-300';
+                }
+            }
+        }
+
+        function playSound(type) {
+            if (!gameState.soundEnabled) return;
+            try {
+                const ctx = getAudioContext();
+                if (!ctx) return;
+
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+
+                const now = ctx.currentTime;
+
+                if (type === 'click') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(400, now);
+                    osc.frequency.exponentialRampToValueAtTime(800, now + 0.05);
+                    gain.gain.setValueAtTime(0.15, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.05);
+                    osc.start(now);
+                    osc.stop(now + 0.05);
+                } else if (type === 'correct') {
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(523.25, now); // C5
+                    osc.frequency.setValueAtTime(659.25, now + 0.08); // E5
+                    osc.frequency.setValueAtTime(783.99, now + 0.16); // G5
+                    gain.gain.setValueAtTime(0.2, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+                    osc.start(now);
+                    osc.stop(now + 0.3);
+                } else if (type === 'wrong') {
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(220, now); // A3
+                    osc.frequency.setValueAtTime(180, now + 0.12);
+                    gain.gain.setValueAtTime(0.2, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
+                    osc.start(now);
+                    osc.stop(now + 0.25);
+                } else if (type === 'fanfare') {
+                    const notes = [523.25, 659.25, 783.99, 1046.50];
+                    notes.forEach((freq, index) => {
+                        const noteOsc = ctx.createOscillator();
+                        const noteGain = ctx.createGain();
+                        noteOsc.type = 'triangle';
+                        noteOsc.connect(noteGain);
+                        noteGain.connect(ctx.destination);
+                        
+                        const noteTime = now + (index * 0.09);
+                        noteOsc.frequency.setValueAtTime(freq, noteTime);
+                        noteGain.gain.setValueAtTime(0.25, noteTime);
+                        noteGain.gain.exponentialRampToValueAtTime(0.01, noteTime + 0.2);
+                        
+                        noteOsc.start(noteTime);
+                        noteOsc.stop(noteTime + 0.2);
+                    });
+                }
+            } catch (e) {
+                console.log('Audio playback error:', e);
+            }
+        }
+
+        /* ==========================================================================
+           3. DATA BABAK CERITA (KSSR m/s 60)
+           ========================================================================== */
+        const storyScenes = [
+            {
+                id: 1,
+                title: "Perkampungan Naning",
+                text: "Naning merupakan sebuah kawasan perkampungan Melayu yang makmur dan bersempadan dengan Melaka.",
+                fallbackText: "Babak 1: Perkampungan Naning (Bersempadan dengan Melaka)"
+            },
+            {
+                id: 2,
+                title: "Kenali Dol Said",
+                text: "Nama sebenar Dol Said ialah Abdul Said bin Omar. Beliau dilahirkan pada tahun 1773, berasal daripada suku Semelenggang dan memegang jawatan sebagai Penghulu Naning Seri Merah Raja Dol Said.",
+                fallbackText: "Babak 2: Dol Said - Penghulu Naning Seri Merah Raja Dol Said"
+            },
+            {
+                id: 3,
+                title: "Mengapa Dol Said Menentang British?",
+                text: "British mendakwa Naning ialah jajahannya tetapi Dol Said membantah. Beliau enggan membayar cukai hasil tahunan satu persepuluh dan tegas mempertahankan kedaulatan Naning.",
+                fallbackText: "Babak 3: Penentangan terhadap Dakwaan Cukai & Kedaulatan Naning"
+            },
+            {
+                id: 4,
+                title: "Perjuangan Naning",
+                text: "Pada tahun 1831, British menyerang Naning tetapi kalah kerana Dol Said mendapat bantuan dari Ulu Muar, Sungai Ujong, Seri Menanti dan Rembau. Namun pada tahun 1832, British menyerang semula dan menang kerana sekutu Dol Said membantu British. Akhirnya, Dol Said menyerah diri, diberi pencen, sebidang tanah dan dibawa ke Melaka.",
+                fallbackText: "Babak 4: Perang Naning 1831 & 1832"
+            }
+        ];
+
+        function startAdventure() {
+            const inputGroup = document.getElementById('input-group');
+            if (inputGroup && inputGroup.value.trim() !== "") {
+                gameState.groupName = inputGroup.value.trim();
+            }
+            playSound('fanfare');
+            playBgm();
+            updateStatusBar();
+            renderStoryScene(1);
+        }
+<!-- ... existing code ... baseline renderMission -- >
+        function renderMission(missionId) {
+            const screen = document.getElementById('app-screen');
+            if (screen) {
+                screen.setAttribute('data-screen', `mission-${missionId}`);
+            }
+            
+            // Pengawalan Muzik Latar (BGM): Berhenti pada Misi 5, Main pada Misi 1-4
+            if (missionId === 5) {
+                pauseBgm();
+            } else {
+                playBgm();
+            }
+
+            updateStatusBar();
+            const main = document.getElementById('main-content');
+            if (!main) return;
+
+            if (missionId === 1) {
+                renderMission1(main);
+            } else if (missionId === 2) {
+                renderMission2(main);
+            } else if (missionId === 3) {
+                renderMission3(main);
+            } else if (missionId === 4) {
+                renderMission4(main);
+            } else if (missionId === 5) {
+                renderMission5(main);
+            }
+        }
+
+        function renderMission1(main) {
+            main.innerHTML = `
+                <div class="max-w-3xl mx-auto space-y-6 animate-fade-in">
+                    <div class="bg-emerald-950/80 border border-amber-500/40 p-5 rounded-2xl flex justify-between items-center text-amber-300">
+                        <h2 class="text-xl font-black flex items-center gap-2">
+                            <i class="fa-solid fa-user-shield text-amber-400"></i> MISI 1 – KENALI PAHLAWAN
+                        </h2>
+                        <span class="text-sm font-bold bg-amber-500/20 px-3 py-1 rounded-full border border-amber-400/30">1 daripada 4 Misi</span>
+                    </div>
+
+                    <div class="space-y-6">
+                        ${m1Data.map((item, index) => `
+                            <div class="bg-slate-900/90 border border-slate-700/80 p-5 md:p-6 rounded-2xl space-y-3">
+                                <p class="text-lg font-bold text-amber-200">${index + 1}. ${item.q}</p>
+                                <div class="grid grid-cols-1 gap-2.5">
+                                    ${item.options.map((opt, optIdx) => {
+                                        const isSelected = gameState.m1Answers[item.id] === optIdx;
+                                        return `
+                                            <button onclick="selectM1Answer(${item.id}, ${optIdx})" 
+                                                class="w-full text-left p-3.5 rounded-xl border font-bold text-sm md:text-base transition ${
+                                                    isSelected 
+                                                    ? 'bg-amber-500 border-amber-400 text-slate-950 shadow-md' 
+                                                    : 'bg-slate-800/80 border-slate-700 text-slate-200 hover:bg-slate-700/80'
+                                                }">
+                                                <span class="inline-block w-6 text-amber-300 font-extrabold ${isSelected ? 'text-slate-950' : ''}">${String.fromCharCode(65 + optIdx)}.</span> ${opt}
+                                            </button>
+                                        `;
+                                    }).join('')}
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+
+                    <div id="m1-feedback" class="hidden p-4 rounded-2xl text-center font-bold text-base"></div>
+
+                    <div class="flex justify-between items-center pt-2">
+                        <button onclick="playSound('click'); renderStoryScene(4)" class="px-5 py-3 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-xl text-sm">
+                            <i class="fa-solid fa-arrow-left mr-1"></i> Cerita
+                        </button>
+                        <button onclick="checkM1()" class="px-7 py-3.5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-slate-950 font-black rounded-xl text-base shadow-lg transition">
+                            Semak Jawapan Misi 1
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function selectM1Answer(qId, optionIdx) {
+            playSound('click');
+            gameState.m1Answers[qId] = optionIdx;
+            renderMission1(document.getElementById('main-content'));
+        }
+
+        function checkM1() {
+            let correctCount = 0;
+            m1Data.forEach(item => {
+                if (gameState.m1Answers[item.id] === item.ans) {
+                    correctCount++;
+                }
+            });
+
+            const fb = document.getElementById('m1-feedback');
+            if (fb) {
+                fb.classList.remove('hidden', 'bg-emerald-950', 'border-emerald-500', 'text-emerald-200', 'bg-rose-950', 'border-rose-500', 'text-rose-200');
+
+                if (correctCount === m1Data.length) {
+                    playSound('correct');
+                    if (!gameState.completedMissions[0]) {
+                        gameState.score += 25;
+                        gameState.completedMissions[0] = true;
+                    }
+                    fb.className = "p-4 rounded-2xl text-center font-bold text-base bg-emerald-950 border-2 border-emerald-500 text-emerald-200 shadow-lg animate-fade-in";
+                    fb.innerHTML = `
+                        <p class="text-xl">Syabas! Kamu berjaya mengenali pahlawan kita!</p>
+                        <button onclick="playSound('click'); renderMission(2)" class="mt-3 px-6 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-black rounded-xl text-sm">
+                            Teruskan ke Misi 2 <i class="fa-solid fa-arrow-right ml-1"></i>
+                        </button>
+                    `;
+                } else {
+                    playSound('wrong');
+                    fb.className = "p-4 rounded-2xl text-center font-bold text-base bg-rose-950 border-2 border-rose-500 text-rose-200 shadow-lg animate-fade-in";
+                    fb.innerHTML = `Belum tepat. Sila jawab semua soalan dengan betul untuk meneruskan.`;
+                }
+            }
+            updateStatusBar();
+        }
+
+        function renderStoryScene(sceneId) {
+            gameState.currentStoryScene = sceneId;
+            const screen = document.getElementById('app-screen');
+            if (screen) {
+                screen.setAttribute('data-screen', 'story');
+            }
+            playBgm();
+            updateStatusBar();
+
+            const scene = storyScenes.find(s => s.id === sceneId) || storyScenes[0];
+            const uploadedImg = gameState.uploadedImages[sceneId];
+            const main = document.getElementById('main-content');
+            if (!main) return;
+
+            main.innerHTML = `
+                <div class="max-w-4xl mx-auto space-y-6 animate-fade-in">
+                    <div class="flex justify-between items-center text-xs font-bold text-amber-300 bg-slate-900/80 px-4 py-2 rounded-xl border border-slate-700">
+                        <span><i class="fa-solid fa-book-open mr-1"></i> PENCERITAAN SEJARAH</span>
+                        <span>Babak ${sceneId} daripada ${storyScenes.length}</span>
+                    </div>
+
+                    <div class="bg-slate-900/90 border-2 border-amber-500/40 rounded-3xl overflow-hidden shadow-2xl space-y-4 p-4 md:p-6">
+                        <div class="relative w-full h-64 md:h-96 rounded-2xl overflow-hidden bg-slate-950 border border-slate-700 flex items-center justify-center">
+                            ${uploadedImg ? `
+                                <img src="${uploadedImg}" class="w-full h-full object-contain animate-zoom" alt="${scene.title}">
+                            ` : `
+                                <div class="w-full h-full flex flex-col items-center justify-center p-6 text-center bg-gradient-to-br from-amber-950/60 via-slate-900 to-emerald-950/60 space-y-3">
+                                    <i class="fa-solid fa-mountain-sun text-6xl text-amber-500/60 animate-pulse"></i>
+                                    <h3 class="text-xl font-black text-amber-300">${scene.title}</h3>
+                                    <p class="text-xs text-slate-400 max-w-md">${scene.fallbackText}</p>
+                                    <button onclick="openImageModal()" class="px-3 py-1.5 bg-amber-500 text-slate-950 text-xs font-bold rounded-lg hover:bg-amber-400">
+                                        <i class="fa-solid fa-upload mr-1"></i> Muat Naik Gambar Babak Ini
+                                    </button>
+                                </div>
+                            `}
+                        </div>
+
+                        <div class="space-y-3 bg-slate-800/80 p-5 rounded-2xl border border-slate-700">
+                            <h2 class="text-2xl font-black text-amber-400 flex items-center gap-2">
+                                <i class="fa-solid fa-feather-pointed"></i> ${scene.title}
+                            </h2>
+                            <p class="text-base md:text-lg text-slate-200 leading-relaxed">${scene.text}</p>
+                        </div>
+
+                        <div class="flex justify-between items-center pt-2">
+                            <button onclick="playSound('click'); ${sceneId > 1 ? `renderStoryScene(${sceneId - 1})` : 'renderHome()'}" class="px-5 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-xl text-sm border border-slate-700">
+                                <i class="fa-solid fa-arrow-left mr-1"></i> Kembali
+                            </button>
+                            ${sceneId < storyScenes.length ? `
+                                <button onclick="playSound('click'); renderStoryScene(${sceneId + 1})" class="px-6 py-2.5 bg-amber-500 hover:bg-amber-600 text-slate-950 font-black rounded-xl text-sm shadow">
+                                    Seterusnya <i class="fa-solid fa-arrow-right ml-1"></i>
+                                </button>
+                            ` : `
+                                <button onclick="playSound('click'); renderMission(1)" class="px-7 py-3 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-slate-950 font-black rounded-xl text-base shadow-lg transition">
+                                    MULAKAN MISI <i class="fa-solid fa-shield-halved ml-1"></i>
+                                </button>
+                            `}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        /* --- HALAMAN UTAMA --- */
+        function renderHome() {
+            const screen = document.getElementById('app-screen');
+            if (screen) {
+                screen.setAttribute('data-screen', 'home');
+            }
+            updateStatusBar();
+            const main = document.getElementById('main-content');
+            if (!main) return;
+
+            main.innerHTML = `
+                <div class="max-w-3xl mx-auto space-y-6 text-center animate-fade-in bg-slate-900/80 border-2 border-amber-500/40 p-6 md:p-10 rounded-3xl backdrop-blur-md shadow-2xl">
+                    <div class="inline-block p-4 bg-amber-500/10 rounded-full border border-amber-500/30 text-amber-400 mb-2">
+                        <i class="fa-solid fa-shield-halved text-5xl md:text-6xl"></i>
+                    </div>
+
+                    <h1 class="text-3xl md:text-5xl font-black text-amber-400 tracking-wide uppercase">
+                        MISI JEJAK PAHLAWAN
+                    </h1>
+                    <h2 class="text-xl md:text-2xl font-bold text-emerald-300">
+                        Pengembaraan Dol Said
+                    </h2>
+
+                    <p class="text-base md:text-lg text-slate-200 italic max-w-xl mx-auto">
+                        "Beranikah kamu menelusuri sejarah perjuangan Dol Said dan menyelesaikan semua misi?"
+                    </p>
+
+                    <div class="max-w-md mx-auto space-y-2 text-left bg-slate-800/80 p-4 rounded-2xl border border-slate-700">
+                        <label class="text-xs font-bold text-amber-300 uppercase block">Nama Kumpulan / Murid:</label>
+                        <input type="text" id="input-group" value="${gameState.groupName}" class="w-full bg-slate-900 border border-slate-600 rounded-xl px-4 py-2.5 text-amber-200 font-bold text-sm focus:outline-none focus:border-amber-400">
+                    </div>
+
+                    <div class="flex flex-col sm:flex-row justify-center gap-4 pt-2">
+                        <button onclick="startAdventure()" class="px-8 py-4 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-slate-950 font-black text-lg rounded-2xl shadow-xl transition transform hover:scale-105">
+                            <i class="fa-solid fa-play mr-2"></i> MULA PENGEMBARAAN
+                        </button>
+                        <button onclick="showInstructions()" class="px-6 py-4 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-2xl border border-slate-700 transition">
+                            <i class="fa-solid fa-circle-question mr-2 text-amber-400"></i> CARA BERMAIN
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function showInstructions() {
+            playSound('click');
+            const main = document.getElementById('main-content');
+            if (!main) return;
+
+            main.innerHTML = `
+                <div class="max-w-2xl mx-auto space-y-5 animate-fade-in bg-slate-900 border-2 border-amber-500/40 p-6 rounded-3xl shadow-2xl">
+                    <h2 class="text-2xl font-black text-amber-400 flex items-center gap-2">
+                        <i class="fa-solid fa-scroll"></i> Cara Bermain
+                    </h2>
+                    <ol class="space-y-3 text-sm md:text-base text-slate-200 list-decimal list-inside font-medium bg-slate-800/80 p-5 rounded-2xl border border-slate-700">
+                        <li>Baca <strong>Penceritaan Sejarah 4 Babak</strong> secara teliti bersama kumpulan anda.</li>
+                        <li>Selesaikan <strong>Misi 1</strong> (Aneka Pilihan Identiti Dol Said).</li>
+                        <li>Selesaikan <strong>Misi 2</strong> (Sebab Penentangan terhadap British).</li>
+                        <li>Selesaikan <strong>Misi 3</strong> (Susun Urutan Kronologi Peristiwa 1831 & 1832).</li>
+                        <li>Selesaikan <strong>Misi 4</strong> (Cabaran Soalan Pemahaman & Sebab-Akibat).</li>
+                        <li>Jalankan <strong>Misi 5</strong> (Latihan Bercerita Lisan Kumpulan yang dinilai Guru).</li>
+                    </ol>
+                    <div class="text-right">
+                        <button onclick="renderHome()" class="px-6 py-2.5 bg-amber-500 hover:bg-amber-600 text-slate-950 font-black rounded-xl text-sm">
+                            Kembali ke Halaman Utama
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderMission2(main) {
+            main.innerHTML = `
+                <div class="max-w-3xl mx-auto space-y-6 animate-fade-in">
+                    <div class="bg-emerald-950/80 border border-amber-500/40 p-5 rounded-2xl flex justify-between items-center text-amber-300">
+                        <h2 class="text-xl font-black flex items-center gap-2">
+                            <i class="fa-solid fa-shield-halved text-amber-400"></i> MISI 2 – RAHSIA PENENTANGAN
+                        </h2>
+                        <span class="text-sm font-bold bg-amber-500/20 px-3 py-1 rounded-full border border-amber-400/30">2 daripada 5 Misi</span>
+                    </div>
+
+                    <div class="bg-slate-900/90 border border-slate-700/80 p-5 md:p-6 rounded-2xl space-y-4">
+                        <p class="text-amber-200 font-bold text-lg">Pilih SEMUA pernyataan yang BETUL mengenai sebab penentangan Dol Said terhadap British:</p>
+                        
+                        <div class="space-y-3">
+                            ${m2Options.map(opt => {
+                                const isChecked = gameState.m2Answers.includes(opt.id);
+                                return `
+                                    <div onclick="toggleM2Option('${opt.id}')" 
+                                        class="p-4 rounded-xl border cursor-pointer font-bold text-sm md:text-base flex items-start gap-3 transition ${
+                                            isChecked 
+                                            ? 'bg-amber-500/20 border-amber-400 text-amber-200' 
+                                            : 'bg-slate-800/80 border-slate-700 text-slate-300 hover:bg-slate-700/80'
+                                        }">
+                                        <input type="checkbox" ${isChecked ? 'checked' : ''} class="mt-1 w-5 h-5 accent-amber-500 rounded">
+                                        <span>${opt.text}</span>
+                                    </div>
+                                `;
+                            }).join('')}
+                        </div>
+                    </div>
+
+                    <div id="m2-feedback" class="hidden p-5 rounded-2xl space-y-2 text-base"></div>
+
+                    <div class="flex justify-between items-center pt-2">
+                        <button onclick="playSound('click'); renderMission(1)" class="px-5 py-3 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-xl text-sm">
+                            <i class="fa-solid fa-arrow-left mr-1"></i> Misi 1
+                        </button>
+                        <button onclick="checkM2()" class="px-7 py-3.5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-slate-950 font-black rounded-xl text-base shadow-lg transition">
+                            Semak Jawapan Misi 2
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function toggleM2Option(id) {
+            playSound('click');
+            if (gameState.m2Answers.includes(id)) {
+                gameState.m2Answers = gameState.m2Answers.filter(x => x !== id);
+            } else {
+                gameState.m2Answers.push(id);
+            }
+            renderMission2(document.getElementById('main-content'));
+        }
+
+        function checkM2() {
+            const correctIds = m2Options.filter(x => x.correct).map(x => x.id);
+            const isAllCorrect = correctIds.every(id => gameState.m2Answers.includes(id)) && 
+                                 gameState.m2Answers.every(id => correctIds.includes(id));
+
+            const fb = document.getElementById('m2-feedback');
+            fb.classList.remove('hidden');
+
+            if (isAllCorrect) {
+                playSound('correct');
+                if (!gameState.completedMissions[1]) {
+                    gameState.score += 25;
+                    gameState.completedMissions[1] = true;
+                }
+                fb.className = "p-5 rounded-2xl bg-emerald-950 border-2 border-emerald-500 text-emerald-100 shadow-lg space-y-3 animate-fade-in";
+                fb.innerHTML = `
+                    <p class="text-xl font-black text-amber-300">Tahniah! Pilihan kamu tepat!</p>
+                    <p class="text-sm md:text-base"><strong>Penerangan:</strong> Dol Said menentang British kerana membantah dakwaan Naning sebagai jajahan British, enggan membayar cukai 1/10, dan mahu mempertahankan kedaulatan Naning.</p>
+                    <button onclick="playSound('click'); renderMission(3)" class="px-6 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-black rounded-xl text-sm shadow">
+                        Teruskan ke Misi 3 <i class="fa-solid fa-arrow-right ml-1"></i>
+                    </button>
+                `;
+            } else {
+                playSound('wrong');
+                fb.className = "p-5 rounded-2xl bg-rose-950 border-2 border-rose-500 text-rose-200 shadow-lg animate-fade-in";
+                fb.innerHTML = `
+                    <p class="font-bold text-lg">Cuba periksa semula pilihan anda!</p>
+                    <p class="text-sm">Pastikan anda memilih sebab penentangan sebenar mengikut buku teks Sejarah.</p>
+                `;
+            }
+            updateStatusBar();
+        }
+
+        /* --- MISI 3 --- */
+        const initialCards = [
+            { id: 'c1', orderCorrect: 0, text: "Pada tahun 1831, British menyerang Naning tetapi kalah kerana Dol Said menerima bantuan ketenteraan dari Ulu Muar, Sungai Ujong, Seri Menanti dan Rembau." },
+            { id: 'c2', orderCorrect: 1, text: "Pada tahun 1832, British menyerang semula Naning dan berjaya mengalahkan Dol Said kerana sekutu Dol Said membantu British." },
+            { id: 'c3', orderCorrect: 2, text: "Akhirnya, Dol Said menyerah diri, diberi pencen, sebidang tanah dan dibawa ke Melaka." }
+        ];
+
+        function renderMission3(main) {
+            main.innerHTML = `
+                <div class="max-w-3xl mx-auto space-y-6 animate-fade-in">
+                    <div class="bg-emerald-950/80 border border-amber-500/40 p-5 rounded-2xl flex justify-between items-center text-amber-300">
+                        <h2 class="text-xl font-black flex items-center gap-2">
+                            <i class="fa-solid fa-timeline text-amber-400"></i> MISI 3 – SUSUN KRONOLOGI
+                        </h2>
+                        <span class="text-sm font-bold bg-amber-500/20 px-3 py-1 rounded-full border border-amber-400/30">3 daripada 4 Misi</span>
+                    </div>
+
+                    <div class="bg-slate-900/90 border border-slate-700/80 p-5 md:p-6 rounded-2xl space-y-4">
+                        <p class="text-amber-200 font-bold text-base md:text-lg">Susun kad peristiwa di bawah mengikut urutan kronologi yang betul (Gunakan butang Naik/Turun):</p>
+
+                        <div class="space-y-3">
+                            ${gameState.m3Order.map((cardIdx, pos) => {
+                                const card = initialCards[cardIdx];
+                                return `
+                                    <div class="p-4 rounded-xl bg-slate-800 border-2 border-amber-500/40 flex items-center gap-4 shadow-md">
+                                        <div class="bg-amber-500 text-slate-950 font-black w-8 h-8 rounded-full flex items-center justify-center shrink-0">
+                                            ${pos + 1}
+                                        </div>
+                                        <p class="text-slate-100 font-semibold text-sm md:text-base flex-1">${card.text}</p>
+                                        <div class="flex flex-col gap-1">
+                                            <button onclick="moveM3(${pos}, -1)" ${pos === 0 ? 'disabled class="opacity-30 cursor-not-allowed"' : 'class="p-2 bg-slate-700 hover:bg-slate-600 rounded-lg text-amber-300 font-bold text-xs"'}>
+                                                <i class="fa-solid fa-chevron-up"></i>
+                                            </button>
+                                            <button onclick="moveM3(${pos}, 1)" ${pos === gameState.m3Order.length - 1 ? 'disabled class="opacity-30 cursor-not-allowed"' : 'class="p-2 bg-slate-700 hover:bg-slate-600 rounded-lg text-amber-300 font-bold text-xs"'}>
+                                                <i class="fa-solid fa-chevron-down"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                `;
+                            }).join('')}
+                        </div>
+                    </div>
+
+                    <div id="m3-feedback" class="hidden p-5 rounded-2xl text-center space-y-3"></div>
+
+                    <div class="flex justify-between items-center pt-2">
+                        <button onclick="playSound('click'); renderMission(2)" class="px-5 py-3 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-xl text-sm">
+                            <i class="fa-solid fa-arrow-left mr-1"></i> Misi 2
+                        </button>
+                        <button onclick="checkM3()" class="px-7 py-3.5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-slate-950 font-black rounded-xl text-base shadow-lg transition">
+                            Semak Kronologi
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function moveM3(pos, dir) {
+            playSound('click');
+            const targetPos = pos + dir;
+            if (targetPos < 0 || targetPos >= gameState.m3Order.length) return;
+            const temp = gameState.m3Order[pos];
+            gameState.m3Order[pos] = gameState.m3Order[targetPos];
+            gameState.m3Order[targetPos] = temp;
+            renderMission3(document.getElementById('main-content'));
+        }
+
+        function checkM3() {
+            const isCorrect = gameState.m3Order[0] === 0 && gameState.m3Order[1] === 1 && gameState.m3Order[2] === 2;
+            const fb = document.getElementById('m3-feedback');
+            fb.classList.remove('hidden');
+
+            if (isCorrect) {
+                playSound('correct');
+                if (!gameState.completedMissions[2]) {
+                    gameState.score += 25;
+                    gameState.completedMissions[2] = true;
+                }
+                fb.className = "p-5 rounded-2xl bg-emerald-950 border-2 border-emerald-500 text-emerald-100 shadow-lg space-y-3 animate-fade-in";
+                fb.innerHTML = `
+                    <p class="text-2xl font-black text-amber-300">Tahniah!</p>
+                    <p class="font-bold text-lg">Kamu berjaya menyusun kronologi perjuangan Dol Said!</p>
+                    <button onclick="playSound('click'); renderMission(4)" class="px-6 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-black rounded-xl text-sm shadow">
+                        Teruskan ke Misi 4 <i class="fa-solid fa-arrow-right ml-1"></i>
+                    </button>
+                `;
+            } else {
+                playSound('wrong');
+                fb.className = "p-5 rounded-2xl bg-rose-950 border-2 border-rose-500 text-rose-200 shadow-lg animate-fade-in";
+                fb.innerHTML = `
+                    <p class="font-bold text-lg">Urutan kronologi belum tepat.</p>
+                    <p class="text-sm">Petunjuk: Peristiwa bermula dengan Perang 1831, diikuti Perang 1832, dan berakhir apabila Dol Said menyerah diri.</p>
+                `;
+            }
+            updateStatusBar();
+        }
+
+        /* --- MISI 4 --- */
+        const m4Data = [
+            { id: 1, q: "Mengapakah British kalah dalam serangan Naning pada tahun 1831?", options: ["Dol Said mendapat bantuan ketenteraan dari negeri jiran", "British kekurangan senjata", "Dol Said menggunakan strategi laut"], ans: 0 },
+            { id: 2, q: "Apakah yang menyebabkan kekalahan Dol Said pada tahun 1832?", options: ["Ribut besar di Naning", "Sekutu Dol Said membantu British", "Dol Said kehabisan makanan"], ans: 1 }
+        ];
+
+        function renderMission4(main) {
+            main.innerHTML = `
+                <div class="max-w-3xl mx-auto space-y-6 animate-fade-in">
+                    <div class="bg-emerald-950/80 border border-amber-500/40 p-5 rounded-2xl flex justify-between items-center text-amber-300">
+                        <h2 class="text-xl font-black flex items-center gap-2">
+                            <i class="fa-solid fa-award text-amber-400"></i> MISI 4 – CABARAN PAHLAWAN
+                        </h2>
+                        <span class="text-sm font-bold bg-amber-500/20 px-3 py-1 rounded-full border border-amber-400/30">4 daripada 5 Misi</span>
+                    </div>
+
+                    <!-- Soalan Pemahaman -->
+                    <div class="space-y-4">
+                        ${m4Data.map((item, idx) => `
+                            <div class="bg-slate-900/90 border border-slate-700/80 p-5 rounded-2xl space-y-3">
+                                <p class="text-amber-200 font-bold text-base md:text-lg">${idx + 1}. ${item.q}</p>
+                                <div class="grid grid-cols-1 gap-2">
+                                    ${item.options.map((opt, optIdx) => {
+                                        const isSelected = gameState.m4Answers[item.id] === optIdx;
+                                        return `
+                                            <button onclick="selectM4Answer(${item.id}, ${optIdx})" 
+                                                class="w-full text-left p-3 rounded-xl border font-bold text-sm transition ${
+                                                    isSelected 
+                                                    ? 'bg-amber-500 border-amber-400 text-slate-950' 
+                                                    : 'bg-slate-800/80 border-slate-700 text-slate-200 hover:bg-slate-700'
+                                                }">
+                                                ${opt}
+                                            </button>
+                                        `;
+                                    }).join('')}
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+
+                    <div id="m4-feedback" class="hidden p-4 rounded-2xl text-center font-bold text-base"></div>
+
+                    <div class="flex justify-between items-center pt-2">
+                        <button onclick="playSound('click'); renderMission(3)" class="px-5 py-3 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-xl text-sm">
+                            <i class="fa-solid fa-arrow-left mr-1"></i> Misi 3
+                        </button>
+                        <button onclick="checkM4()" class="px-7 py-3.5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-slate-950 font-black rounded-xl text-base shadow-lg transition">
+                            Semak Misi 4 & Teruskan
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function selectM4Answer(qId, optIdx) {
+            playSound('click');
+            gameState.m4Answers[qId] = optIdx;
+            renderMission4(document.getElementById('main-content'));
+        }
+
+        function checkM4() {
+            let correct = 0;
+            m4Data.forEach(item => {
+                if (gameState.m4Answers[item.id] === item.ans) correct++;
+            });
+
+            if (correct === m4Data.length) {
+                playSound('correct');
+                if (!gameState.completedMissions[3]) {
+                    gameState.score += 25;
+                    gameState.completedMissions[3] = true;
+                }
+                const fb = document.getElementById('m4-feedback');
+                fb.classList.remove('hidden');
+                fb.className = "p-5 rounded-2xl text-center font-bold text-base bg-emerald-950 border-2 border-emerald-500 text-emerald-100 shadow-lg animate-fade-in space-y-3";
+                fb.innerHTML = `
+                    <p class="text-xl font-black text-amber-300">Tahniah! Semua soalan pemahaman tepat!</p>
+                    <button onclick="playSound('click'); renderMission(5)" class="px-6 py-3 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-black rounded-xl text-base shadow-lg transition">
+                        TERUSKAN KE MISI 5 <i class="fa-solid fa-arrow-right ml-2"></i>
+                    </button>
+                `;
+            } else {
+                playSound('wrong');
+                const fb = document.getElementById('m4-feedback');
+                fb.classList.remove('hidden');
+                fb.className = "p-4 rounded-2xl text-center font-bold text-base bg-rose-950 border-2 border-rose-500 text-rose-200 shadow-lg animate-fade-in";
+                fb.innerHTML = `Sila jawab semua soalan kefahaman dengan tepat untuk meneruskan.`;
+            }
+            updateStatusBar();
+        }
+
+        /* --- MISI 5 --- */
+        const m5Cards = [
+            { id: 1, title: "Kad 1 — Kenali Dol Said" },
+            { id: 2, title: "Kad 2 — Sebab Penentangan" },
+            { id: 3, title: "Kad 3 — Tahun 1831" },
+            { id: 4, title: "Kad 4 — Tahun 1832" },
+            { id: 5, title: "Kad 5 — Kesudahan Perjuangan" }
+        ];
+
+        function renderMission5(main) {
+            main.innerHTML = `
+                <div class="max-w-5xl mx-auto space-y-6 animate-fade-in">
+                    <div class="bg-emerald-950/80 border border-amber-500/40 p-5 rounded-2xl flex justify-between items-center text-amber-300">
+                        <h2 class="text-xl font-black flex items-center gap-2">
+                            <i class="fa-solid fa-comments text-amber-400"></i> MISI 5 – KISAH SANG PAHLAWAN
+                        </h2>
+                        <span class="text-sm font-bold bg-amber-500/20 px-3 py-1 rounded-full border border-amber-400/30">5 daripada 5 Misi</span>
+                    </div>
+
+                    <!-- Arahan Murid -->
+                    <div class="bg-slate-900/90 border border-slate-700 p-5 rounded-2xl space-y-3">
+                        <p class="text-base md:text-lg font-bold text-amber-200">
+                            "Perhatikan gambar dan ceritakan semula perjuangan Dol Said menggunakan ayat kamu sendiri. Tekan butang 'LIHAT KATA KUNCI' jika memerlukan bantuan!"
+                        </p>
+                        <div class="flex flex-wrap gap-3 items-center justify-between pt-1">
+                            <div class="text-xs text-slate-300 flex items-center gap-2">
+                                <span class="bg-amber-500/20 text-amber-300 px-2.5 py-1 rounded-lg font-bold border border-amber-400/30">Penggunaan Gambar:</span>
+                                Bermula dengan <strong>Gambar Versi A (Gambar Sahaja)</strong>.
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Kad Bahan Rangsangan Bergambar (Versi A & B) -->
+                    <div class="relative bg-slate-900/90 border-2 border-amber-500/40 p-4 rounded-3xl space-y-4">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+                            ${m5Cards.map(card => renderM5CardItem(card)).join('')}
+                        </div>
+                    </div>
+
+                    <!-- Ruang Murid Selesai & Status Guru -->
+                    <div class="bg-amber-950/40 border-2 border-amber-500/60 p-5 md:p-6 rounded-2xl space-y-4">
+                        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-3">
+                            <div>
+                                <h3 class="text-lg font-black text-amber-300 flex items-center gap-2">
+                                    <i class="fa-solid fa-user-check"></i> Status Sesi Bercerita Kumpulan
+                                </h3>
+                                <p class="text-xs md:text-sm text-slate-300 mt-1">Selepas kumpulan anda selesai menceritakan 5 kad ini, tekan butang di bawah untuk semakan guru.</p>
+                            </div>
+
+                            <button onclick="submitM5Oral()" class="px-6 py-3 ${gameState.m5Submitted ? 'bg-amber-500/30 border border-amber-400 text-amber-300' : 'bg-amber-500 hover:bg-amber-600 text-slate-950'} font-black rounded-xl text-sm shadow transition">
+                                ${gameState.m5Submitted ? '<i class="fa-solid fa-clock mr-1"></i> MENUNGGU PENGESAHAN GURU' : 'KAMI SELESAI BERCERITA'}
+                            </button>
+                        </div>
+
+                        <!-- PANEL PENTAKSIRAN GURU -->
+                        <div class="mt-4 bg-slate-900 border-2 border-amber-400/80 p-5 rounded-2xl space-y-4 shadow-xl">
+                            <div class="flex justify-between items-center border-b border-slate-700 pb-2">
+                                <span class="text-sm font-black text-amber-400 uppercase tracking-wide flex items-center gap-2">
+                                    <i class="fa-solid fa-chalkboard-user"></i> Panel Pentaksiran Guru Sejarah
+                                </span>
+                                <span class="text-xs px-2.5 py-1 rounded-full font-bold ${gameState.m5Approved ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-400/40' : 'bg-amber-500/20 text-amber-300 border border-amber-400/40'}">
+                                    ${gameState.m5Approved ? 'DISAHKAN' : 'MENUNGGU PENGESAHAN'}
+                                </span>
+                            </div>
+
+                            <p class="text-xs text-slate-300">Guru sila tanda (✓) pada 3 kriteria pencapaian lisan murid di bawah:</p>
+
+                            <div class="space-y-2.5 text-sm">
+                                <label class="flex items-center gap-3 p-2.5 bg-slate-800/80 rounded-xl border border-slate-700 cursor-pointer">
+                                    <input type="checkbox" onchange="toggleTeacherCheck('fact')" ${gameState.m5TeacherChecks.fact ? 'checked' : ''} class="w-5 h-5 accent-amber-500">
+                                    <span class="text-slate-100 font-semibold">1. Fakta sejarah yang disampaikan tepat mengikut panduan.</span>
+                                </label>
+                                <label class="flex items-center gap-3 p-2.5 bg-slate-800/80 rounded-xl border border-slate-700 cursor-pointer">
+                                    <input type="checkbox" onchange="toggleTeacherCheck('chrono')" ${gameState.m5TeacherChecks.chrono ? 'checked' : ''} class="w-5 h-5 accent-amber-500">
+                                    <span class="text-slate-100 font-semibold">2. Tiga peristiwa disampaikan mengikut urutan kronologi yang betul.</span>
+                                </label>
+                                <label class="flex items-center gap-3 p-2.5 bg-slate-800/80 rounded-xl border border-slate-700 cursor-pointer">
+                                    <input type="checkbox" onchange="toggleTeacherCheck('speech')" ${gameState.m5TeacherChecks.speech ? 'checked' : ''} class="w-5 h-5 accent-amber-500">
+                                    <span class="text-slate-100 font-semibold">3. Penyampaian jelas dan menggunakan ayat sendiri secara bertatasusila.</span>
+                                </label>
+                            </div>
+
+                            <div class="pt-2 flex flex-wrap justify-between items-center gap-3">
+                                <button onclick="rejectM5Teacher()" class="px-4 py-2 bg-rose-900/60 hover:bg-rose-800 text-rose-200 font-bold rounded-xl text-xs border border-rose-500/40 transition">
+                                    <i class="fa-solid fa-rotate-left mr-1"></i> Minta Kumpulan Cuba Lagi
+                                </button>
+                                <button onclick="approveM5Teacher()" class="px-6 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-black rounded-xl text-sm shadow transition">
+                                    <i class="fa-solid fa-circle-check mr-1.5"></i> Sahkan & Lihat Keputusan Akhir
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="m5-feedback" class="hidden p-4 rounded-2xl text-center font-bold text-base"></div>
+
+                    <div class="flex justify-between items-center pt-2">
+                        <button onclick="playSound('click'); renderMission(4)" class="px-5 py-3 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-xl text-sm">
+                            <i class="fa-solid fa-arrow-left mr-1"></i> Misi 4
+                        </button>
+                    </div>
+                </div>
+
+                <!-- MODAL ZOOM KAD M5 -->
+                <div id="m5-card-modal" class="fixed inset-0 z-50 bg-black/90 backdrop-blur-md hidden items-center justify-center p-4">
+                    <div class="bg-slate-900 border-2 border-amber-500 rounded-3xl p-5 max-w-2xl w-full space-y-4 text-slate-100">
+                        <div class="flex justify-between items-center border-b border-slate-700 pb-2">
+                            <h3 id="modal-card-title" class="text-xl font-black text-amber-400">Pratonton Kad</h3>
+                            <button onclick="closeCardModal()" class="text-slate-400 hover:text-white font-bold text-2xl px-2">&times;</button>
+                        </div>
+                        <div id="modal-card-body" class="space-y-4"></div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderM5CardItem(card) {
+            const showKeywords = gameState.m5CardKeywordState[card.id];
+            const imgSrc = showKeywords ? gameState.m5Images[card.id].B : gameState.m5Images[card.id].A;
+
+            return `
+                <div class="bg-slate-800/90 border-2 border-amber-500/30 rounded-2xl overflow-hidden shadow-lg flex flex-col justify-between p-2.5 space-y-2.5">
+                    <div onclick="zoomCard(${card.id})" class="group cursor-pointer relative rounded-xl overflow-hidden bg-slate-950 h-72 md:h-80 border border-slate-700 hover:border-amber-400 transition flex items-center justify-center">
+                        <img src="${imgSrc}" alt="${card.title}" class="w-full h-full object-contain transition transform group-hover:scale-105" onerror="this.onerror=null; this.src='https://placehold.co/300x500/1e293b/f59e0b?text=Kad+${card.id}+(${showKeywords ? 'Versi+B' : 'Versi+A'})';">
+                        <div class="absolute top-2 left-2 bg-amber-500/90 text-slate-950 px-2 py-0.5 rounded-md font-black text-[11px] shadow backdrop-blur-sm">
+                            ${card.title}
+                        </div>
+                        <div class="absolute bottom-2 right-2 bg-black/70 text-amber-300 text-xs px-2 py-1 rounded-md opacity-0 group-hover:opacity-100 transition">
+                            <i class="fa-solid fa-magnifying-glass-plus"></i>
+                        </div>
+                    </div>
+
+                    <!-- KAWALAN PERTUKARAN GAMBAR VERSI A / B -->
+                    <div class="space-y-1.5 pt-1">
+                        <button onclick="toggleCardKeyword(${card.id})" class="w-full py-2 px-2 rounded-xl text-xs font-black transition ${showKeywords ? 'bg-amber-500 text-slate-950 shadow-md hover:bg-amber-600' : 'bg-slate-700 hover:bg-slate-600 text-slate-200 border border-slate-500/50'}">
+                            ${showKeywords ? '<i class="fa-solid fa-eye-slash mr-1"></i> SEMBUNYIKAN KATA KUNCI' : '<i class="fa-solid fa-key mr-1"></i> LIHAT KATA KUNCI'}
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function toggleCardKeyword(cardId) {
+            playSound('click');
+            gameState.m5CardKeywordState[cardId] = !gameState.m5CardKeywordState[cardId];
+            renderMission5(document.getElementById('main-content'));
+        }
+
+        function zoomCard(cardId) {
+            playSound('click');
+            const modal = document.getElementById('m5-card-modal');
+            const title = document.getElementById('modal-card-title');
+            const body = document.getElementById('modal-card-body');
+            if (!modal || !title || !body) return;
+
+            const cardObj = m5Cards.find(c => c.id === cardId);
+            title.textContent = cardObj ? cardObj.title : `Kad ${cardId}`;
+            const showKeywords = gameState.m5CardKeywordState[cardId];
+            const imgSrc = showKeywords ? gameState.m5Images[cardId].B : gameState.m5Images[cardId].A;
+
+            body.innerHTML = `
+                <div class="w-full h-96 md:h-[65vh] bg-slate-950 rounded-2xl border border-slate-700 overflow-hidden flex items-center justify-center p-2">
+                    <img src="${imgSrc}" class="max-w-full max-h-full object-contain rounded-xl" alt="${cardObj.title}">
+                </div>
+
+                <div class="flex justify-between items-center bg-slate-800 p-3 rounded-2xl border border-slate-700">
+                    <span class="text-xs md:text-sm font-bold text-amber-300">
+                        ${showKeywords ? 'Paparan: Gambar Versi B (+ Kata Kunci)' : 'Paparan: Gambar Versi A (Gambar Sahaja)'}
+                    </span>
+                    <button onclick="toggleCardKeyword(${cardId}); zoomCard(${cardId});" class="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-slate-950 font-black rounded-xl text-xs shadow">
+                        ${showKeywords ? 'SEMBUNYIKAN KATA KUNCI' : 'LIHAT KATA KUNCI'}
+                    </button>
+                </div>
+            `;
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeCardModal() {
+            playSound('click');
+            const modal = document.getElementById('m5-card-modal');
+            if (modal) {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            }
+        }
+
+        function submitM5Oral() {
+            playSound('click');
+            gameState.m5Submitted = true;
+            const fb = document.getElementById('m5-feedback');
+            if (fb) {
+                fb.classList.remove('hidden');
+                fb.className = "p-4 rounded-2xl text-center font-bold text-base bg-amber-950 border-2 border-amber-500 text-amber-200 shadow-lg animate-fade-in";
+                fb.innerHTML = `Sesi bercerita dihantar! Sila minta guru mengesahkan pentaksiran lisan di bahagian panel pentaksiran.`;
+            }
+            renderMission5(document.getElementById('main-content'));
+        }
+
+        function toggleTeacherCheck(type) {
+            playSound('click');
+            gameState.m5TeacherChecks[type] = !gameState.m5TeacherChecks[type];
+        }
+
+        function rejectM5Teacher() {
+            playSound('wrong');
+            gameState.m5Approved = false;
+            gameState.m5Submitted = false;
+            const fb = document.getElementById('m5-feedback');
+            if (fb) {
+                fb.classList.remove('hidden');
+                fb.className = "p-4 rounded-2xl text-center font-bold text-base bg-rose-950 border-2 border-rose-500 text-rose-200 shadow-lg animate-fade-in";
+                fb.innerHTML = `Guru telah meminta kumpulan mencuba semula aktiviti bercerita.`;
+            }
+            renderMission5(document.getElementById('main-content'));
+        }
+
+        function approveM5Teacher() {
+            const checks = gameState.m5TeacherChecks;
+            if (!checks.fact || !checks.chrono || !checks.speech) {
+                playSound('wrong');
+                alert("Sila tandakan ketiga-tiga kriteria pentaksiran sebelum membuat pengesahan.");
+                return;
+            }
+
+            playSound('fanfare');
+            gameState.m5Approved = true;
+                if (!gameState.completedMissions[4]) {
+                    gameState.score += 20;
+                    gameState.completedMissions[4] = true;
+                }
+            renderResults();
+        }
+
+        /* ==========================================================================
+           7. SKRIN KEPUTUSAN AKHIR (RESULTS SCREEN)
+           ========================================================================== */
+        function renderResults() {
+            const screen = document.getElementById('app-screen');
+            if (screen) {
+                screen.setAttribute('data-screen', 'results');
+            }
+            updateStatusBar();
+
+            const completedCount = gameState.completedMissions.filter(Boolean).length;
+            let badge = { title: "Penjelajah Sejarah", icon: "fa-compass", color: "text-amber-400" };
+
+            if (gameState.score >= 120) {
+                badge = { title: "Pahlawan Cemerlang Naning", icon: "fa-crown", color: "text-amber-300" };
+            } else if (gameState.score >= 90) {
+                badge = { title: "Kronologi Wira", icon: "fa-medal", color: "text-emerald-300" };
+            } else if (gameState.score >= 50) {
+                badge = { title: "Pembela Naning", icon: "fa-shield", color: "text-blue-300" };
+            }
+
+            const main = document.getElementById('main-content');
+            if (!main) return;
+
+            main.innerHTML = `
+                <div class="max-w-3xl mx-auto space-y-6 text-center animate-fade-in bg-slate-900/90 border-2 border-amber-500/50 p-6 md:p-10 rounded-3xl backdrop-blur-md shadow-2xl">
+                    <div class="inline-block p-4 bg-amber-500/20 rounded-full border border-amber-400/40 text-amber-300 mb-2">
+                        <i class="fa-solid ${badge.icon} text-5xl md:text-6xl ${badge.color}"></i>
+                    </div>
+
+                    <h1 class="text-3xl md:text-4xl font-black text-amber-400">KEPUTUSAN PENGEMBARAAN</h1>
+                    <p class="text-xl font-bold text-slate-200">Kumpulan: <span class="text-amber-300">${gameState.groupName}</span></p>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 my-6">
+                        <div class="bg-slate-800/90 p-4 rounded-2xl border border-slate-700">
+                            <span class="text-xs text-slate-400 font-bold block mb-1">JUMLAH MARKAH</span>
+                            <span class="text-3xl font-black text-amber-400">${gameState.score}</span>
+                        </div>
+                        <div class="bg-slate-800/90 p-4 rounded-2xl border border-slate-700">
+                            <span class="text-xs text-slate-400 font-bold block mb-1">MISI DISELESAIKAN</span>
+                            <span class="text-3xl font-black text-emerald-400">${completedCount} / 5</span>
+                        </div>
+                        <div class="bg-slate-800/90 p-4 rounded-2xl border border-slate-700">
+                            <span class="text-xs text-slate-400 font-bold block mb-1">LENCANA PENCAPAIAN</span>
+                            <span class="text-lg font-extrabold ${badge.color}">${badge.title}</span>
+                        </div>
+                    </div>
+
+                    <div class="p-4 bg-emerald-950/60 border border-emerald-500/30 rounded-2xl text-left space-y-2 text-xs md:text-sm text-emerald-200">
+                        <p><i class="fa-solid fa-circle-info text-amber-400 mr-1.5"></i> <strong>Peringatan Pentaksiran Guru:</strong> Markah automatik ini adalah gambaran pencapaian misi digital. Penilaian penguasaan objektif pembelajaran penuh masih memerlukan pemerhatian lisan dan tindakan susulan guru.</p>
+                    </div>
+
+                    <div class="flex flex-col sm:flex-row justify-center gap-4 pt-4">
+                        <button onclick="resetGame()" class="px-6 py-3.5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-slate-950 font-black rounded-xl text-base shadow-lg transition">
+                            <i class="fa-solid fa-rotate-right mr-1.5"></i> MAIN SEMULA
+                        </button>
+                        <button onclick="renderStoryScene(1)" class="px-6 py-3.5 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-xl text-base transition border border-slate-700">
+                            <i class="fa-solid fa-book-open mr-1.5"></i> LIHAT SEMULA CERITA
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function resetGame() {
+            playSound('click');
+            gameState.score = 0;
+            gameState.completedMissions = [false, false, false, false, false];
+            gameState.m1Answers = {};
+            gameState.m2Answers = [];
+            gameState.m3Order = [0, 1, 2];
+            gameState.m4Answers = {};
+            gameState.m5CardKeywordState = { 1: false, 2: false, 3: false, 4: false, 5: false };
+            gameState.m5Submitted = false;
+            gameState.m5TeacherChecks = { fact: false, chrono: false, speech: false };
+            gameState.m5Approved = false;
+            renderHome();
+        }
+
+        /* ==========================================================================
+           8. PELANCARAN APLIKASI
+           ========================================================================== */
+        window.addEventListener('DOMContentLoaded', () => {
+            initBgm();
+            renderHome();
+        });
+    </script>
+</body>
+</html>
