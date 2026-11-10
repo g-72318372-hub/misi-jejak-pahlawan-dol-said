@@ -207,40 +207,40 @@
             bgmEnabled: true,
             bgmVolume: 0.12,
             
-            // LALUAN FIZIKAL AUDIO KEKAL (Default Fallback ke assets/audio/BGM.wav)
-            bgmSrc: localStorage.getItem('naning_bgm_audio') || 'assets/audio/Misi_Jejak_Pahlawan_Instrumental_Tenang.wav',
+            // LALUAN FIZIKAL AUDIO KEKAL (Default Fallback ke BGM.wav)
+            bgmSrc: localStorage.getItem('naning_bgm_audio') || 'Misi_Jejak_Pahlawan_Instrumental_Tenang.wav',
             currentStoryScene: 1,
             completedMissions: [false, false, false, false, false],
             
-            // LALUAN FIZIKAL GAMBAR BABAK 1 - 4 KEKAL (Default Fallback ke assets/images/...)
+            // LALUAN FIZIKAL GAMBAR BABAK 1 - 4 KEKAL (Default Fallback ke ...)
             uploadedImages: {
-                1: localStorage.getItem('naning_img_1') || 'assets/images/babak1-kampung.png',
-                2: localStorage.getItem('naning_img_2') || 'assets/images/babak2-dolsaid.png',
-                3: localStorage.getItem('naning_img_3') || 'assets/images/babak3-konflik.png',
-                4: localStorage.getItem('naning_img_4') || 'assets/images/babak4-perjuangan.png'
+                1: localStorage.getItem('naning_img_1') || 'babak1-kampung.png',
+                2: localStorage.getItem('naning_img_2') || 'babak2-dolsaid.png',
+                3: localStorage.getItem('naning_img_3') || 'babak3-konflik.png',
+                4: localStorage.getItem('naning_img_4') || 'babak4-perjuangan.png'
             },
 
             // LALUAN FIZIKAL GAMBAR MISI 5 KEKAL (10 Fail: 5 Pasangan Versi A & Versi B)
             m5Images: {
                 1: {
-                    A: localStorage.getItem('naning_m5_1_A') || 'assets/images/Kad_1_Kenali_Dol_Said_Gambar_Sahaja.jpg',
-                    B: localStorage.getItem('naning_m5_1_B') || 'assets/images/Kad_1_Kenali_Dol_Said_Gambar_dan_Kata_Kunci.jpg'
+                    A: localStorage.getItem('naning_m5_1_A') || 'Kad_1_Kenali_Dol_Said_Gambar_Sahaja.jpg.png',
+                    B: localStorage.getItem('naning_m5_1_B') || 'Kad_1_Kenali_Dol_Said_Gambar_dan_Kata_Kunci.jpg.png'
                 },
                 2: {
-                    A: localStorage.getItem('naning_m5_2_A') || 'assets/images/Kad_2_Sebab_Penentangan_Gambar_Sahaja.jpg',
-                    B: localStorage.getItem('naning_m5_2_B') || 'assets/images/Kad_2_Sebab_Penentangan_Gambar_Sahaja.jpg'
+                    A: localStorage.getItem('naning_m5_2_A') || 'Kad_2_Sebab_Penentangan_Gambar_Sahaja.jpg.png',
+                    B: localStorage.getItem('naning_m5_2_B') || 'Kad_2_Sebab_Penentangan_Gambar_dan_Kata_Kunci.jpg.png'
                 },
                 3: {
-                    A: localStorage.getItem('naning_m5_3_A') || 'assets/images/Kad_3_Tahun_1831_Gambar_Sahaja.jpg',
-                    B: localStorage.getItem('naning_m5_3_B') || 'assets/images/Kad_3_Tahun_1831_Gambar_dan_Kata_Kunci.jpg'
+                    A: localStorage.getItem('naning_m5_3_A') || 'Kad_3_Tahun_1831_Gambar_Sahaja.jpg.png',
+                    B: localStorage.getItem('naning_m5_3_B') || 'Kad_3_Tahun_1831_Gambar_dan_Kata_Kunci.jpg.png'
                 },
                 4: {
-                    A: localStorage.getItem('naning_m5_4_A') || 'assets/images/Kad_4_Tahun_1832_Gambar_Sahaja.jpg',
-                    B: localStorage.getItem('naning_m5_4_B') || 'assets/images/Kad_4_Tahun_1832_Gambar_dan_Kata_Kunci.jpg'
+                    A: localStorage.getItem('naning_m5_4_A') || 'Kad_4_Tahun_1832_Gambar_Sahaja.jpg.png',
+                    B: localStorage.getItem('naning_m5_4_B') || 'Kad_4_Tahun_1832_Gambar_dan_Kata_Kunci.jpg.png'
                 },
                 5: {
-                    A: localStorage.getItem('naning_m5_5_A') || 'assets/images/Kad_5_Kesudahan_Perjuangan_Gambar_Sahaja.jpg',
-                    B: localStorage.getItem('naning_m5_5_B') || 'assets/images/Kad_5_Kesudahan_Perjuangan_Gambar_dan_Kata_Kunci.jpg'
+                    A: localStorage.getItem('naning_m5_5_A') || 'Kad_5_Kesudahan_Perjuangan_Gambar_Sahaja.jpg.png',
+                    B: localStorage.getItem('naning_m5_5_B') || 'Kad_5_Kesudahan_Perjuangan_Gambar_dan_Kata_Kunci.jpg.png'
                 }
             },
 
@@ -586,7 +586,7 @@
             updateStatusBar();
             renderStoryScene(1);
         }
-<!-- ... existing code ... baseline renderMission -- >
+// Fungsi renderMission
         function renderMission(missionId) {
             const screen = document.getElementById('app-screen');
             if (screen) {
